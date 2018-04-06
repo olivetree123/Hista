@@ -18,14 +18,12 @@ class ObjDownloadEndpoint(Resource):
         """
         获取 obj 列表
         """
-        obj_id = request.args.get("obj_id")
-        action = request.args.get("action")
-        if not (obj_id and obj_id.isdigit()):
+        name = request.args.get("name")
+        bucket = request.args.get("bucket")
+        if not (name and bucket):
             return APIResponse(code=BAD_REQUEST)
-        r = Obj.get_or_none(Obj.id == int(obj_id))
-        if not r:
-            return APIResponse(data=r)
-        b = Bucket.get_by_name(r.bucket_name)
+        r = Obj.get_by_name(bucket, name)
+        b = Bucket.get_by_name(bucket)
         content = ""
         with open(os.path.join(b.path, r.md5_hash), "rb") as f:
             content = f.read()

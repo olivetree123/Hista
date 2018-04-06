@@ -17,11 +17,11 @@ class ObjEndpoint(Resource):
         """
         获取 obj
         """
-        obj_id = request.args.get("obj_id")
-        action = request.args.get("action")
-        if not (obj_id and obj_id.isdigit()):
+        name = request.args.get("name")
+        bucket = request.args.get("bucket")
+        if not (name and bucket):
             return APIResponse(code=BAD_REQUEST)
-        r = Obj.get_or_none(Obj.id == int(obj_id))
+        r = Obj.get_by_name(bucket, name)
         r = r.to_json() if r else None
         return APIResponse(data=r)
     
@@ -31,19 +31,19 @@ class ObjEndpoint(Resource):
         """
         name = request.form.get("name")
         info = request.form.get("info")
-        bucket_name = request.form.get("bucket_name")
+        bucket = request.form.get("bucket")
         f = request.files["file"]
-        if not (name and bucket_name and f):
+        if not (name and bucket and f):
             return APIResponse(code=BAD_REQUEST)
         md5_hash = file_md5(f)
-        b = Bucket.get_by_name(bucket_name)
+        b = Bucket.get_by_name(bucket)
         if not b:
             return APIResponse(code=BUCKET_NOT_FOUND)
         if not os.path.exists(b.path):
             os.makedirs(b.path)
         f.seek(0)
         f.save(os.path.join(b.path, md5_hash))
-        obj = Obj.create_or_update(name=name, bucket_name=bucket_name, filename=f.filename, md5_hash=md5_hash, info=info)
+        obj = Obj.create_or_update(name=name, bucket=bucket, filename=f.filename, md5_hash=md5_hash, info=info)
         obj = obj.to_json() if obj else obj
         return APIResponse(data=obj)
     
@@ -51,7 +51,10 @@ class ObjEndpoint(Resource):
         """
         删除 obj
         """
-        obj_id = request.get_json().get("obj_id")
-        obj = Obj.remove(obj_id)
+        name = request.get_json().get("name")
+        bucket = request.get_json().get("bucket")
+        if not (name and bucket):
+            return APIResponse(code=BAD_REQUEST)
+        obj = Obj.remove(bucket, name)
         return APIResponse()
         

@@ -17,6 +17,18 @@ class ObjListEndpoint(Resource):
         """
         获取 obj 列表
         """
-        objs = Obj.list()
-        objs = [obj.to_json() for obj in objs]
+        bucket = request.args.get("bucket")
+        objs = Obj.list_obj(bucket)
+        objs = [obj.to_json() for obj in objs] if objs else None
         return APIResponse(data=objs)
+    
+    def delete(self):
+        """
+        批量删除 obj
+        """
+        bucket   = request.get_json().get("bucket")
+        name_list = request.get_json().get("name_list")
+        if not (bucket and name_list and isinstance(name_list, (tuple, list))):
+            return APIResponse(code=BAD_REQUEST)
+        Obj.remove_objs(bucket, name_list)
+        return APIResponse()

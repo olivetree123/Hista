@@ -16,10 +16,10 @@ class BucketEndpoint(Resource):
         """
         获取 bucket 信息
         """
-        bucket_id = request.args.get("bucket_id")
-        if not (bucket_id and bucket_id.isdigit()):
+        name = request.args.get("name")
+        if not name:
             return APIResponse(code=BAD_REQUEST)
-        b = Bucket.get_or_none(Bucket.id == int(bucket_id))
+        b = Bucket.get_by_name(name)
         b = b.to_json() if b else None
         return APIResponse(data=b)
     
@@ -28,10 +28,11 @@ class BucketEndpoint(Resource):
         创建 bucket
         """
         name = request.get_json().get("name")
+        info = request.get_json().get("info")
         public = request.get_json().get("public", 0)
         if not (name and public in [0, 1]):
             return APIResponse(code=BAD_REQUEST)
-        b = Bucket.add(name=name, public=public)
+        b = Bucket.add(name=name, public=public, info=info)
         r = b.to_json() if b else None
         return APIResponse(data=r)
 
@@ -39,12 +40,22 @@ class BucketEndpoint(Resource):
         """
         更新 bucket
         """
-        bucket_id = request.get_json().get("bucket_id")
         name = request.get_json().get("name")
-        public = request.get_json().get("public", 0)
-        if not (bucket_id and isinstance(bucket_id, int) and public in [0, 1]):
+        info = request.get_json().get("info")
+        public = request.get_json().get("public", None)
+        if not (name and public in [0, 1, None]):
             return APIResponse(code=BAD_REQUEST)
-        b = Bucket.renew(bucket_id, name=name, public=public)
+        b = Bucket.renew(name=name, public=public, info=info)
         r = b.to_json() if b else None
         return APIResponse(data=r)
+    
+    def delete(self):
+        """
+        删除 bucket
+        """
+        name = request.get_json().get("name")
+        if not name:
+            return APIResponse(code=BAD_REQUEST)
+        Bucket.remove(name)
+        return APIResponse()
         

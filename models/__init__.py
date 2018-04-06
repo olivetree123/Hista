@@ -6,7 +6,7 @@ from peewee import SqliteDatabase, MySQLDatabase, Model, BooleanField, DateTimeF
 
 from utils.functions import field_to_json
 
-sqlite_db = MySQLDatabase("lyric", host="localhost", port=3306, user="root", password="gaojian")
+sqlite_db = MySQLDatabase("hista", host="localhost", port=3306, user="root", password="gaojian")
 
 class BaseModel(Model):
     """A base model that will use our Sqlite database."""

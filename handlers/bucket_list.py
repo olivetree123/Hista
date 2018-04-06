@@ -14,6 +14,6 @@ class BucketListEndpoint(Resource):
         """
         获取 bucket 列表
         """
-        bks = Bucket.list()
+        bks = Bucket.list_bucket()
         bks = [b.to_json() for b in bks]
         return APIResponse(data=bks)
