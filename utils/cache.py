@@ -5,7 +5,10 @@ import redis
 from config import REDIS_HOST, REDIS_PORT
 
 r = redis.Redis(host=REDIS_HOST, port=REDIS_PORT)
+
+def set_cache(key, value, src_type=""):
     if src_type == "json":
+        value = json.dumps(value)
     r.set(key, value)
 
 def get_cache(key, target_type=""):
