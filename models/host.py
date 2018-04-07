@@ -21,3 +21,10 @@ class Host(BaseModel):
     def count(cls):
         return cls.select().where(cls.status == True).count()
         
+    @classmethod
+    def get_host_by_md5(cls, md5):
+        host_count = cls.count()
+        number = int(md5, 16) % host_count
+        host_list = cls.list()
+        return host_list[number]
+
