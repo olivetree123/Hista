@@ -6,8 +6,11 @@ from flask_restful import Resource, marshal_with
 from models.obj import Obj
 from models.bucket import Bucket
 from utils.functions import file_md5
+from utils.cache import set_cache, get_cache
 from utils.response import BAD_REQUEST, BUCKET_NOT_FOUND
 from base import resource_fields, APIResponse
+from config import SERIAL_NUMBER_CACHE
+from storage.hista import hista_save
 
 class ObjEndpoint(Resource):
 
@@ -29,22 +32,30 @@ class ObjEndpoint(Resource):
         """
         创建/更新 obj
         """
-        name = request.form.get("name")
-        info = request.form.get("info")
-        bucket = request.form.get("bucket")
-        f = request.files["file"]
+        name = request.get_json.get("name")
+        info = request.get_json.get("info")
+        md5  = request.get_json.get("md5")
+        bucket = request.get_json.get("bucket")
+        number = request.get_json.get("number", 1)
+        finish = request.get_json.get("finish", 0)
+        filename = request.get_json.get("filename")
+        file_content = request.get_json.get("file_content")
+        # f = request.files["file"]
         if not (name and bucket and f):
             return APIResponse(code=BAD_REQUEST)
-        md5_hash = file_md5(f)
         b = Bucket.get_by_name(bucket)
         if not b:
             return APIResponse(code=BUCKET_NOT_FOUND)
-        if not os.path.exists(b.path):
-            os.makedirs(b.path)
-        f.seek(0)
-        f.save(os.path.join(b.path, md5_hash))
-        obj = Obj.create_or_update(name=name, bucket=bucket, filename=f.filename, md5_hash=md5_hash, info=info)
-        obj = obj.to_json() if obj else obj
+        if finish == 1:
+            obj = Obj.create_or_update(name=name, bucket=bucket, filename=filename, md5_hash=md5, info=info)
+            obj = obj.to_json() if obj else obj
+        else
+            obj = None
+        serial = get_cache(SERIAL_CACHE.format(md5))
+        if number <= serial:
+            return APIResponse(data=obj)
+        hista_save(b.path, file_content, md5)
+        set_cache(SERIAL_CACHE.format(md5), number)
         return APIResponse(data=obj)
     
     def delete(self):

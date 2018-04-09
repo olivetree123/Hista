@@ -1,5 +1,19 @@
 #coding:utf-8
 
+
+settings = ConfigParser.ConfigParser()
+settings.read("hista.conf")
+
+ROLE = settings.get("main", "role").slower()
+
+MYSQL_HOST = settings.get("db", "mysql_host")
+MYSQL_PORT = settings.getint("db", "mysql_port")
+MYSQL_USER = settings.get("db", "mysql_user")
+MYSQL_PASSWORD = settings.get("db", "mysql_password")
+REDIS_HOST = settings.get("db", "redis_host")
+REDIS_PORT = settings.getint("db", "redis_port")
+
+SERIAL_CACHE = "SERIALNUMBER:{}"
 BUCKET_BASE_PATH = "/Users/gao/hista"
 UTC_DATETIME_FORMAT = '%Y-%m-%dT%H:%M:%S.%fZ'
 
