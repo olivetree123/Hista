@@ -70,4 +70,55 @@ class ObjEndpoint(Resource):
             return APIResponse(code=BAD_REQUEST)
         obj = Obj.remove(bucket, name)
         return APIResponse()
-        
+
+
+class ObjListEndpoint(Resource):
+
+    decorators = [marshal_with(resource_fields)]
+
+    def get(self):
+        """
+        获取 obj 列表
+        """
+        bucket = request.args.get("bucket")
+        objs = Obj.list_obj(bucket)
+        objs = [obj.to_json() for obj in objs] if objs else None
+        return APIResponse(data=objs)
+    
+    def delete(self):
+        """
+        批量删除 obj
+        """
+        bucket   = request.get_json().get("bucket")
+        name_list = request.get_json().get("name_list")
+        if not (bucket and name_list and isinstance(name_list, (tuple, list))):
+            return APIResponse(code=BAD_REQUEST)
+        Obj.remove_objs(bucket, name_list)
+        return APIResponse()
+
+
+class ObjDownloadEndpoint(Resource):
+
+    def get(self):
+        """
+        获取 obj 列表
+        """
+        name = request.args.get("name")
+        bucket = request.args.get("bucket")
+        if not (name and bucket):
+            return APIResponse(code=BAD_REQUEST)
+        obj = Obj.get_by_name(bucket, name)
+        if not obj:
+            return APIResponse(code=OBJECT_NOT_FOUND)
+        b = Bucket.get_by_name(bucket)
+        # content = ""
+        # with open(os.path.join(b.path, obj.md5_hash), "rb") as f:
+        #     content = f.read()
+        host = Host.get_or_none(Host.id == obj.host_id)
+        url = "http://" + host.ip_addr + "/api/file"
+        r = request.get(url)
+        response = make_response(r.content)
+        mime_type = mimetypes.guess_type(obj.filename)[0]
+        response.headers['Content-Type'] = mime_type
+        response.headers['Content-Disposition'] = 'attachment; filename={}'.format(obj.filename.encode().decode('latin-1'))
+        return response

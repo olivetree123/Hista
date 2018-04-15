@@ -13,6 +13,15 @@ class Host(BaseModel):
     password = CharField(null=False, help_text="password")
 
     @classmethod
+    def create_host(cls, name, path, ip_addr, username, password):
+        try:
+            host = cls.create(name=name, path=path, status=True, ip_addr=ip_addr, username=username, password=password)
+        except Exception as e:
+            print(e)
+            return None
+        return host
+
+    @classmethod
     def list(cls):
         hosts = cls.select().where(cls.status == True)
         return hosts

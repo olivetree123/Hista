@@ -58,4 +58,16 @@ class BucketEndpoint(Resource):
             return APIResponse(code=BAD_REQUEST)
         Bucket.remove(name)
         return APIResponse()
-        
+
+
+class BucketListEndpoint(Resource):
+
+    decorators = [marshal_with(resource_fields)]
+
+    def get(self):
+        """
+        获取 bucket 列表
+        """
+        bks = Bucket.list_bucket()
+        bks = [b.to_json() for b in bks]
+        return APIResponse(data=bks)

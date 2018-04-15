@@ -3,12 +3,9 @@
 from flask_restful import Api
 
 from config import ROLE
-from handlers.bucket import BucketEndpoint
-from handlers.bucket_list import BucketListEndpoint
-from handlers.obj import ObjEndpoint
-from handlers.obj_list import ObjListEndpoint
-from handlers.obj_download import ObjDownloadEndpoint
 from handlers.file import FileEndpoint
+from handlers.bucket import BucketEndpoint, BucketListEndpoint
+from handlers.obj import ObjEndpoint, ObjListEndpoint, ObjDownloadEndpoint
 
 api = Api()
 
