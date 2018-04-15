@@ -4,6 +4,7 @@ from flask import request
 from flask_restful import Resource, marshal_with
 
 from models.obj import Obj
+from models.host import Host
 from models.bucket import Bucket
 from utils.functions import file_md5
 from utils.cache import set_cache, get_cache
@@ -46,8 +47,9 @@ class ObjEndpoint(Resource):
         b = Bucket.get_by_name(bucket)
         if not b:
             return APIResponse(code=BUCKET_NOT_FOUND)
+        host = Host.get_host_by_md5(md5)
         if finish == 1:
-            obj = Obj.create_or_update(name=name, bucket=bucket, filename=filename, md5_hash=md5, info=info)
+            obj = Obj.create_or_update(name=name, bucket=bucket, filename=filename, md5_hash=md5, host_id=host.id, info=info)
             obj = obj.to_json() if obj else obj
         else
             obj = None

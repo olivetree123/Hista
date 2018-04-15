@@ -8,6 +8,7 @@ from handlers.bucket_list import BucketListEndpoint
 from handlers.obj import ObjEndpoint
 from handlers.obj_list import ObjListEndpoint
 from handlers.obj_download import ObjDownloadEndpoint
+from handlers.file import FileEndpoint
 
 api = Api()
 
@@ -20,7 +21,7 @@ if ROLE == "master":
 
 elif ROLE == "slave":
     # slave 需要实现存储数据的接口
-    pass
+    api.add_resource(FileEndpoint, "/api/file", endpoint="file")
 
 else:
     raise Exception("INVALID ROLE = {}. Role should be master or slave.".format(ROLE))

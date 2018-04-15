@@ -1,7 +1,8 @@
 #coding:utf-8
 
-from peewee import CharField
 from datetime import datetime
+from peewee import CharField, IntField
+
 from models import BaseModel, sqlite_db
 
 class Obj(BaseModel):
@@ -10,6 +11,7 @@ class Obj(BaseModel):
     bucket      = CharField(null=False, index=True, help_text="bucket name")
     filename    = CharField(null=False, index=True, help_text="file name")
     md5_hash    = CharField(null=False, index=True, help_text="file hash")
+    host_id     = IntField(null=False, index=True, help_text="host id")
     
     class Meta:
         database = sqlite_db
@@ -19,17 +21,18 @@ class Obj(BaseModel):
         )
 
     @classmethod
-    def create_or_update(cls, name, bucket, filename, md5_hash, info=None, status=True):
+    def create_or_update(cls, name, bucket, filename, md5_hash, host_id, info=None, status=True):
         obj = cls.get_by_name(bucket, name)
         if obj:
             obj.info     = info
             obj.status   = status
+            obj.host_id  = host_id
             obj.filename = filename
             obj.md5_hash = md5_hash
             obj.save()
             return obj
         try:
-            obj = cls.create(name=name, bucket=bucket, filename=filename, md5_hash=md5_hash, info=info, status=status)
+            obj = cls.create(name=name, bucket=bucket, filename=filename, md5_hash=md5_hash, host_id=host_id, info=info, status=status)
         except Exception as e:
             obj = None
         return obj
