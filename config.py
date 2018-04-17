@@ -1,10 +1,10 @@
 #coding:utf-8
+import configparser
 
-
-settings = ConfigParser.ConfigParser()
+settings = configparser.ConfigParser()
 settings.read("hista.conf")
 
-ROLE = settings.get("main", "role").slower()
+ROLE = settings.get("main", "role").lower()
 
 MYSQL_HOST = settings.get("db", "mysql_host")
 MYSQL_PORT = settings.getint("db", "mysql_port")

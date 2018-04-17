@@ -1,7 +1,7 @@
 #coding:utf-8
 
 from datetime import datetime
-from peewee import CharField, IntField
+from peewee import CharField, IntegerField
 
 from models import BaseModel, sqlite_db
 
@@ -11,7 +11,7 @@ class Obj(BaseModel):
     bucket      = CharField(null=False, index=True, help_text="bucket name")
     filename    = CharField(null=False, index=True, help_text="file name")
     md5_hash    = CharField(null=False, index=True, help_text="file hash")
-    host_id     = IntField(null=False, index=True, help_text="host id")
+    host_id     = IntegerField(null=False, index=True, help_text="host id")
     
     class Meta:
         database = sqlite_db

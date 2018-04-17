@@ -1,6 +1,6 @@
 #coding:utf-8
 
-from peewee import CharField
+from peewee import CharField, BooleanField
 from datetime import datetime
 from models import BaseModel, sqlite_db
 

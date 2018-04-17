@@ -9,7 +9,6 @@ from utils.functions import file_md5
 from utils.cache import set_cache, get_cache
 from utils.response import BAD_REQUEST, BUCKET_NOT_FOUND
 from base import resource_fields, APIResponse
-from config import SERIAL_NUMBER_CACHE
 from storage.hista import save
 
 class FileEndpoint(Resource):

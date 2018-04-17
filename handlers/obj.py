@@ -10,7 +10,6 @@ from utils.functions import file_md5
 from utils.cache import set_cache, get_cache
 from utils.response import BAD_REQUEST, BUCKET_NOT_FOUND
 from base import resource_fields, APIResponse
-from config import SERIAL_NUMBER_CACHE
 from storage.hista import hista_save
 
 class ObjEndpoint(Resource):
@@ -51,7 +50,7 @@ class ObjEndpoint(Resource):
         if finish == 1:
             obj = Obj.create_or_update(name=name, bucket=bucket, filename=filename, md5_hash=md5, host_id=host.id, info=info)
             obj = obj.to_json() if obj else obj
-        else
+        else:
             obj = None
         serial = get_cache(SERIAL_CACHE.format(md5))
         if number <= serial:
