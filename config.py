@@ -4,6 +4,7 @@ import configparser
 settings = configparser.ConfigParser()
 settings.read("hista.conf")
 
+PORT = settings.getint("main", "port")
 ROLE = settings.get("main", "role").lower()
 
 MYSQL_DB = settings.get("db", "mysql_db")

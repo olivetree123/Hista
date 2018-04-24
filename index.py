@@ -4,14 +4,16 @@ from flask import Flask
 from flask_restful import Resource
 from api import api
 
-from models import sqlite_db
+from config import port
+from models import db
 from models.obj import Obj
+from models.host import Host
 from models.bucket import Bucket
 
 app = Flask(__name__)
 api.init_app(app)
 
-sqlite_db.create_tables([Obj, Bucket], safe=True)
+db.create_tables([Obj, Bucket, Host], safe=True)
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5005)
+    app.run(debug=True, port=port)
