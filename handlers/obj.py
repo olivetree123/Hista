@@ -32,14 +32,14 @@ class ObjEndpoint(Resource):
         """
         创建/更新 obj
         """
-        name = request.get_json.get("name")
-        info = request.get_json.get("info")
-        md5  = request.get_json.get("md5")
-        bucket = request.get_json.get("bucket")
-        number = request.get_json.get("number", 1)
-        finish = request.get_json.get("finish", 0)
-        filename = request.get_json.get("filename")
-        file_content = request.get_json.get("file_content")
+        name = request.get_json().get("name")
+        info = request.get_json().get("info")
+        md5  = request.get_json().get("md5")
+        bucket = request.get_json().get("bucket")
+        number = request.get_json().get("number", 1)
+        finish = request.get_json().get("finish", 0)
+        filename = request.get_json().get("filename")
+        file_content = request.get_json().get("file_content")
         # f = request.files["file"]
         if not (name and bucket and f):
             return APIResponse(code=BAD_REQUEST)
