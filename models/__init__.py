@@ -4,9 +4,10 @@ from datetime import datetime
 from playhouse.shortcuts import model_to_dict
 from peewee import SqliteDatabase, MySQLDatabase, Model, BooleanField, DateTimeField
 
+from config import MYSQL_HOST, MYSQL_USER, MYSQL_PASSWORD, MYSQL_PORT, MYSQL_DB
 from utils.functions import field_to_json
 
-sqlite_db = MySQLDatabase("hista", host="localhost", port=3306, user="root", password="gaojian")
+db = MySQLDatabase(MYSQL_DB, host=MYSQL_HOST, port=MYSQL_PORT, user=MYSQL_USER, password=MYSQL_PASSWORD)
 
 class BaseModel(Model):
     """A base model that will use our Sqlite database."""
@@ -15,7 +16,7 @@ class BaseModel(Model):
     create_time = DateTimeField(default=datetime.now())
 
     class Meta:
-        database = sqlite_db
+        database = db
     
     @classmethod
     def remove(cls, id):

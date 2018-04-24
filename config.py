@@ -6,6 +6,7 @@ settings.read("hista.conf")
 
 ROLE = settings.get("main", "role").lower()
 
+MYSQL_DB = settings.get("db", "mysql_db")
 MYSQL_HOST = settings.get("db", "mysql_host")
 MYSQL_PORT = settings.getint("db", "mysql_port")
 MYSQL_USER = settings.get("db", "mysql_user")
