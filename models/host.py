@@ -2,7 +2,7 @@
 
 from peewee import CharField, BooleanField
 from datetime import datetime
-from models import BaseModel, sqlite_db
+from models import BaseModel
 
 class Host(BaseModel):
     name     = CharField(help_text="host name")

@@ -3,7 +3,7 @@
 from datetime import datetime
 from peewee import CharField, IntegerField
 
-from models import BaseModel, sqlite_db
+from models import BaseModel, db
 
 class Obj(BaseModel):
     name        = CharField(null=False, index=True, help_text="object name")
@@ -14,7 +14,7 @@ class Obj(BaseModel):
     host_id     = IntegerField(null=False, index=True, help_text="host id")
     
     class Meta:
-        database = sqlite_db
+        database = db
         indexes = (
             (("name", "bucket"), True),
             (("filename", "bucket"), True),
