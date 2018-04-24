@@ -1,11 +1,9 @@
 #coding:utf-8
 
-import peewee
 import hashlib
 from datetime import datetime
-from base64 import b64encode, b64decode
 
-from config import UTC_DATETIME_FORMAT
+UTC_DATETIME_FORMAT = "%Y-%m-%dT%H:%M:%S.%fZ"
 
 def file_md5(f):
     hash_md5 = hashlib.md5()
