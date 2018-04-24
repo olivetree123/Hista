@@ -4,7 +4,7 @@ from datetime import datetime
 from peewee import CharField, BooleanField
 
 from models import BaseModel
-from config import BUCKET_BASE_PATH
+from config import DATA_PATH
 
 class Bucket(BaseModel):
     name = CharField(unique=True, null=False, help_text="bucket name")
@@ -16,7 +16,7 @@ class Bucket(BaseModel):
     def add(cls, name, public=True, status=True, info=None):
         try:
             public = True if public else False
-            path = os.path.join(BUCKET_BASE_PATH, name)
+            path = os.path.join(DATA_PATH, name)
             b = cls.create(name=name, path=path, public=public, status=status, info=info)
         except Exception as e:
             print(e)
