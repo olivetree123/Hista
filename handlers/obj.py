@@ -41,7 +41,7 @@ class ObjEndpoint(Resource):
         filename = request.get_json().get("filename")
         file_content = request.get_json().get("file_content")
         # f = request.files["file"]
-        if not (name and bucket and f):
+        if not (md5 and number and name and bucket and filename):
             return APIResponse(code=BAD_REQUEST)
         b = Bucket.get_by_name(bucket)
         if not b:
