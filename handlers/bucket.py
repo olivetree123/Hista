@@ -28,7 +28,6 @@ class BucketEndpoint(Resource):
         创建 bucket
         """
         data = request.get_json()
-        tp = data.pop("type", None)
         name = data.pop("name", None)
         desc = data.pop("desc", None)
         public = data.pop("public", 0)
@@ -37,7 +36,7 @@ class BucketEndpoint(Resource):
             return APIResponse(code=BAD_REQUEST)
         if not (name and public in [0, 1]):
             return APIResponse(code=BAD_REQUEST)
-        b = Bucket.add(name=name, public=public, type=tp, desc=desc, extra_info=extra_info)
+        b = Bucket.add(name=name, public=public, desc=desc, extra_info=extra_info)
         r = b.to_json() if b else None
         return APIResponse(data=r)
 
@@ -46,7 +45,6 @@ class BucketEndpoint(Resource):
         更新 bucket
         """
         data = request.get_json()
-        tp = data.pop("type", None)
         name = data.pop("name", None)
         desc = data.pop("desc", None)
         public = data.pop("public", 0)
@@ -77,8 +75,7 @@ class BucketListEndpoint(Resource):
         获取 bucket 列表
         """
         data = request.args.to_dict()
-        type = data.pop("type", None)
         status = data.pop("status", True)
-        bks = Bucket.filter_bucket(status=status, type=type, **data)
+        bks = Bucket.filter_bucket(status=status, **data)
         bks = [b.to_json() for b in bks]
         return APIResponse(data=bks)

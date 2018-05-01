@@ -42,32 +42,34 @@ class ObjEndpoint(Resource):
         md5  = data.pop("md5", None)
         bucket = data.pop("bucket", None)
         content = data.pop("content", None)
-        file_obj = request.files.get("file")
+        chunk_num = int(data.pop("chunk_num", 1))
+        total_chunk = int(data.pop("total_chunk", 1))
+        file_objs = request.files.get("file")
         extra_info = data
-        filename = file_obj.filename if file_obj else request.form.get("filename")
-        chunk_num = int(request.form.get("chunk_num", 1))
-        total_chunk = int(request.form.get("total_chunk", 1))
-        if (content and file_obj) or not (content or file_obj) or not bucket:
-            return APIResponse(code=BAD_REQUEST)
-        if content and not md5:
-            return APIResponse(code=BAD_REQUEST)
-        content = content if content else str(file_obj.read(), encoding="latin-1")
-        if not md5:
-            md5 = content_md5(content.encode("latin-1"))
         b = Bucket.get_by_name(bucket)
         if not b:
             return APIResponse(code=BUCKET_NOT_FOUND)
-        # 需要一个异步 worker 来处理 io.
-        r = hista_save(chunk_num, b.path, content, md5, total_chunk)
-        if not r:
-            return APIResponse(code=OBJECT_SAVE_FAILED)
-        if chunk_num == total_chunk:
-            host = Host.get_host_by_md5(md5)
-            obj = Obj.create_or_update(name=name, bucket=bucket, filename=filename or name, md5_hash=md5, host_id=host.id, desc=desc, extra_info=extra_info)
-            obj = obj.to_json() if obj else obj
-        else:
-            obj = None
-        return APIResponse(data=obj)
+        file_objs = file_objs if isinstance(file_objs, (list, tuple)) else [file_objs]
+        result = []
+        for file_obj in file_objs:
+            filename = file_obj.filename if file_obj else request.form.get("filename")
+            if (content and file_obj) or not (content or file_obj):
+                return APIResponse(code=BAD_REQUEST)
+            content = content if content else str(file_obj.read(), encoding="latin-1")
+            if not md5:
+                md5 = content_md5(content.encode("latin-1"))
+            # 需要一个异步 worker 来处理 io.
+            r = hista_save(chunk_num, b.path, content, md5, total_chunk)
+            if not r:
+                return APIResponse(code=OBJECT_SAVE_FAILED)
+            if chunk_num == total_chunk:
+                host = Host.get_host_by_md5(md5)
+                obj = Obj.create_or_update(name=name, bucket=bucket, filename=filename or name, md5_hash=md5, host_id=host.id, desc=desc, extra_info=extra_info)
+                obj = obj.to_json() if obj else obj
+                result.append(obj)
+            else:
+                obj = None
+        return APIResponse(data=result)
     
     def delete(self):
         """
