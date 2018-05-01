@@ -24,11 +24,11 @@ class HostEndpoint(Resource):
         """
         添加主机
         """
-        name = request.get_json.get("name")
-        path = request.get_json.get("path")
-        ip_addr = request.get_json.get("ip_addr")
-        username = request.get_json.get("username")
-        password = request.get_json.get("password")
+        name = request.get_json().get("name")
+        path = request.get_json().get("path")
+        ip_addr = request.get_json().get("ip_addr")
+        username = request.get_json().get("username")
+        password = request.get_json().get("password")
         host = Host.create_host(name, path, ip_addr, username, password)
         host = host.to_json() if host else None
         return APIResponse(code=0, data=host)

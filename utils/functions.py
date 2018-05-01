@@ -5,6 +5,10 @@ from datetime import datetime
 
 UTC_DATETIME_FORMAT = "%Y-%m-%dT%H:%M:%S.%fZ"
 
+def content_md5(content):
+    hash_md5 = hashlib.md5(content)
+    return hash_md5.hexdigest()
+
 def file_md5(f):
     hash_md5 = hashlib.md5()
     for chunk in iter(lambda: f.read(4096), b""):

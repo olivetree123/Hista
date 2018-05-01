@@ -5,15 +5,11 @@ from flask_restful import Resource
 from api import api
 
 from config import PORT
-from models import db
-from models.obj import Obj
-from models.host import Host
-from models.bucket import Bucket
+# from models.init import init_db
 
 app = Flask(__name__)
 api.init_app(app)
-
-db.create_tables([Obj, Bucket, Host], safe=True)
+# init_db()
 
 if __name__ == '__main__':
     app.run(host="0.0.0.0", debug=True, port=PORT)

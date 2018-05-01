@@ -16,6 +16,7 @@ MYSQL_PASSWORD = settings.get("db", "mysql_password")
 REDIS_HOST = settings.get("db", "redis_host")
 REDIS_PORT = settings.getint("db", "redis_port")
 
+TMP_DIR = "{}_tmp"
 SERIAL_CACHE = "SERIALNUMBER:{}"
 
 

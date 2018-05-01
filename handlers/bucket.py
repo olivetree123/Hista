@@ -1,5 +1,5 @@
 #coding:utf-8
-
+import copy
 from flask import request
 from flask_restful import Resource, marshal_with
 
@@ -27,12 +27,17 @@ class BucketEndpoint(Resource):
         """
         创建 bucket
         """
-        name = request.get_json().get("name")
-        info = request.get_json().get("info")
-        public = request.get_json().get("public", 0)
+        data = request.get_json()
+        tp = data.pop("type", None)
+        name = data.pop("name", None)
+        desc = data.pop("desc", None)
+        public = data.pop("public", 0)
+        extra_info = data
+        if extra_info and not isinstance(extra_info, dict):
+            return APIResponse(code=BAD_REQUEST)
         if not (name and public in [0, 1]):
             return APIResponse(code=BAD_REQUEST)
-        b = Bucket.add(name=name, public=public, info=info)
+        b = Bucket.add(name=name, public=public, type=tp, desc=desc, extra_info=extra_info)
         r = b.to_json() if b else None
         return APIResponse(data=r)
 
@@ -40,12 +45,15 @@ class BucketEndpoint(Resource):
         """
         更新 bucket
         """
-        name = request.get_json().get("name")
-        info = request.get_json().get("info")
-        public = request.get_json().get("public", None)
+        data = request.get_json()
+        tp = data.pop("type", None)
+        name = data.pop("name", None)
+        desc = data.pop("desc", None)
+        public = data.pop("public", 0)
+        extra_info = data
         if not (name and public in [0, 1, None]):
             return APIResponse(code=BAD_REQUEST)
-        b = Bucket.renew(name=name, public=public, info=info)
+        b = Bucket.renew(name=name, public=public, desc=desc, extra_info=extra_info)
         r = b.to_json() if b else None
         return APIResponse(data=r)
     
@@ -68,6 +76,9 @@ class BucketListEndpoint(Resource):
         """
         获取 bucket 列表
         """
-        bks = Bucket.list_bucket()
+        data = request.args.to_dict()
+        type = data.pop("type", None)
+        status = data.pop("status", True)
+        bks = Bucket.filter_bucket(status=status, type=type, **data)
         bks = [b.to_json() for b in bks]
         return APIResponse(data=bks)

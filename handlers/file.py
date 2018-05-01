@@ -1,43 +1,42 @@
 #coding:utf-8
 import os
-from flask import request
+import mimetypes
+from flask import request, make_response
 from flask_restful import Resource, marshal_with
 
+from config import DATA_PATH
 from models.obj import Obj
 from models.bucket import Bucket
 from utils.functions import file_md5
 from utils.cache import set_cache, get_cache
 from utils.response import BAD_REQUEST, BUCKET_NOT_FOUND
 from base import resource_fields, APIResponse
-from storage.hista import save
+from storage.hista import local_save
 
 class FileEndpoint(Resource):
 
     def get(self):
-        name = request.args.get("name")
+        md5 = request.args.get("md5")
         bucket = request.args.get("bucket")
-        if not (name and bucket):
+        if not (md5 and bucket):
             return ""
-        obj = Obj.get_by_name(bucket, name)
-        bucket = Bucket.get_by_name(bucket)
-        file_path = os.path.join(bucket.path, obj.md5_hash)
-        if not os.path.exists(file_path):
+        file_path = os.path.join(DATA_PATH, bucket, md5)
+        if not (os.path.exists(file_path) and os.path):
             return ""
-        content = ""
         with open(file_path, "rb") as f:
             content = f.read()
         response = make_response(content)
-        mime_type = mimetypes.guess_type(obj.filename)[0]
-        response.headers['Content-Type'] = mime_type
-        response.headers['Content-Disposition'] = 'attachment; filename={}'.format(obj.filename.encode().decode('latin-1'))
+        response.headers["Content-Disposition"] = "attachment; filename={}".format(md5)
         return response
 
     @marshal_with(resource_fields)
     def post(self):
         # 存储文件
-        md5  = request.get_json.get("md5")
-        path = request.get_json.get("path")
-        content = request.get_json.get("content")
-        save(path, content, md5)
+        md5  = request.form.get("md5")
+        bucket_path = request.form.get("bucket_path")
+        chunk_num  = int(request.form.get("chunk_num", 1))
+        total_chunk  = int(request.form.get("total_chunk", 1))
+        f = request.files["file"]
+        local_save(chunk_num, bucket_path, f.read(), md5, total_chunk)
         return APIResponse()
     

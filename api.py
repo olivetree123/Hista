@@ -3,13 +3,19 @@
 from flask_restful import Api
 
 from config import ROLE
+from models.init import init_db
 from handlers.file import FileEndpoint
+from handlers.host import HostEndpoint
 from handlers.bucket import BucketEndpoint, BucketListEndpoint
 from handlers.obj import ObjEndpoint, ObjListEndpoint, ObjDownloadEndpoint
 
 api = Api()
 
+api.add_resource(FileEndpoint, "/api/file", endpoint="file")
+
 if ROLE == "master":
+    init_db()
+    api.add_resource(HostEndpoint,     "/api/host",      endpoint="host")
     api.add_resource(BucketEndpoint,     "/api/bucket",      endpoint="bucket")
     api.add_resource(BucketListEndpoint, "/api/bucket/list", endpoint="bucket_list")
     api.add_resource(ObjEndpoint,     "/api/object",      endpoint="object")
@@ -18,7 +24,7 @@ if ROLE == "master":
 
 elif ROLE == "slave":
     # slave 需要实现存储数据的接口
-    api.add_resource(FileEndpoint, "/api/file", endpoint="file")
+    pass
 
 else:
     raise Exception("INVALID ROLE = {}. Role should be master or slave.".format(ROLE))

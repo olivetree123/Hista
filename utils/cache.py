@@ -18,7 +18,6 @@ def get_cache(key, target_type=""):
             return value
         if isinstance(value, (str, bytes)) and value.isdigit():
             return int(value)
-        print("Can not convert to int, value = ", value)
         return 0
     elif target_type == "json":
         if isinstance(value, str):
