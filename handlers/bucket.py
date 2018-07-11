@@ -55,14 +55,11 @@ class BucketEndpoint(Resource):
         r = b.to_json() if b else None
         return APIResponse(data=r)
     
-    def delete(self):
+    def delete(self, uid):
         """
         删除 bucket
         """
-        name = request.get_json().get("name")
-        if not name:
-            return APIResponse(code=BAD_REQUEST)
-        Bucket.remove(name)
+        Bucket.remove(uid)
         return APIResponse()
 
 

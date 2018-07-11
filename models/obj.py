@@ -45,7 +45,7 @@ class Obj(BaseModel):
     
     @classmethod
     def list_obj(cls, bucket, **kwargs):
-        res = cls.select().where(cls.bucket == bucket, cls.status == True)
+        res = cls.list().where(cls.bucket == bucket)
         for key, value in kwargs.items():
             res = res.where(cls.extra_info[key] == value)
         return res
@@ -59,7 +59,7 @@ class Obj(BaseModel):
         return obj
     
     @classmethod
-    def remove(cls, bucket, name):
+    def remove_by_name(cls, bucket, name):
         r = cls.update({cls.status : False}).where(cls.bucket == bucket, cls.name == name).execute()
         return r
     

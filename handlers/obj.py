@@ -20,15 +20,11 @@ class ObjEndpoint(Resource):
 
     decorators = [marshal_with(resource_fields)]
 
-    def get(self):
+    def get(self, uid):
         """
         获取 obj
         """
-        name = request.args.get("name")
-        bucket = request.args.get("bucket")
-        if not (name and bucket):
-            return APIResponse(code=BAD_REQUEST)
-        r = Obj.get_by_name(bucket, name)
+        r = Obj.get_by_uid(uid)
         r = r.to_json() if r else None
         return APIResponse(data=r)
     
@@ -44,7 +40,7 @@ class ObjEndpoint(Resource):
         content = data.pop("content", None)
         chunk_num = int(data.pop("chunk_num", 1))
         total_chunk = int(data.pop("total_chunk", 1))
-        file_objs = request.files.get("file")
+        file_objs = request.files.get("file_name")
         extra_info = data
         b = Bucket.get_by_name(bucket)
         if not b:
@@ -53,7 +49,7 @@ class ObjEndpoint(Resource):
         result = []
         for file_obj in file_objs:
             filename = file_obj.filename if file_obj else request.form.get("filename")
-            if (content and file_obj) or not (content or file_obj):
+            if not (content or file_obj):
                 return APIResponse(code=BAD_REQUEST)
             content = content if content else str(file_obj.read(), encoding="latin-1")
             if not md5:
@@ -64,22 +60,18 @@ class ObjEndpoint(Resource):
                 return APIResponse(code=OBJECT_SAVE_FAILED)
             if chunk_num == total_chunk:
                 host = Host.get_host_by_md5(md5)
-                obj = Obj.create_or_update(name=name, bucket=bucket, filename=filename or name, md5_hash=md5, host_id=host.id, desc=desc, extra_info=extra_info)
+                obj = Obj.create_or_update(name=name or md5, bucket=bucket, filename=filename or name, md5_hash=md5, host_id=host.id, desc=desc, extra_info=extra_info)
                 obj = obj.to_json() if obj else obj
                 result.append(obj)
             else:
                 obj = None
         return APIResponse(data=result)
     
-    def delete(self):
+    def delete(self, uid):
         """
         删除 obj
         """
-        name = request.get_json().get("name")
-        bucket = request.get_json().get("bucket")
-        if not (name and bucket):
-            return APIResponse(code=BAD_REQUEST)
-        obj = Obj.remove(bucket, name)
+        obj = Obj.remove(uid)
         return APIResponse()
 
 
@@ -133,6 +125,6 @@ class ObjDownloadEndpoint(Resource):
             content = r.content
         response = make_response(content)
         mime_type = mimetypes.guess_type(obj.filename)[0]
-        response.headers['Content-Type'] = mime_type
-        response.headers['Content-Disposition'] = 'attachment; filename={}'.format(obj.filename.encode().decode('latin-1'))
+        response.headers["Content-Type"] = mime_type
+        response.headers["Content-Disposition"] = "attachment; filename={}".format(obj.filename.encode().decode("latin-1"))
         return response

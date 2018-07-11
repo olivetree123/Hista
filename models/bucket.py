@@ -39,26 +39,16 @@ class Bucket(BaseModel):
         return b
     
     @classmethod
-    def list_bucket(cls):
-        res = cls.select().where(cls.status == True)
-        return res
-    
-    @classmethod
     def get_by_name(cls, name):
         try:
-            b = cls.get(cls.name == name)
+            b = cls.get(cls.name == name, cls.status == True)
         except Bucket.DoesNotExist:
             b = None
         return b
     
     @classmethod
-    def remove(cls, name):
-        r = cls.update({cls.status : False}).where(cls.name == name).execute()
-        return r
-    
-    @classmethod
     def filter_bucket(cls, status=True, **kwargs):
-        r = cls.select().where(cls.status == status)
+        r = cls.list()
         for key, value in kwargs.items():
             r = r.where(cls.extra_info[key] == value)
         return r.execute()
@@ -70,4 +60,4 @@ class Bucket(BaseModel):
             return r
         for key, value in extra_info.items():
             r[key] = value
-        return r        
+        return r

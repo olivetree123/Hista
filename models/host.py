@@ -7,28 +7,24 @@ from models import BaseModel
 class Host(BaseModel):
     name     = CharField(unique=True, help_text="host name")
     path     = CharField(help_text="folder path for stroge")
+    port     = CharField(unique=True, help_text="port")
     status   = BooleanField(default=1, help_text="password")
     ip_addr  = CharField(unique=True, help_text="ip address")
     username = CharField(null=True, help_text="username")
     password = CharField(null=True, help_text="password")
 
     @classmethod
-    def create_host(cls, name, path, ip_addr, username=None, password=None):
+    def create_host(cls, name, path, ip_addr, port, username=None, password=None):
         try:
-            host = cls.create(name=name, path=path, status=True, ip_addr=ip_addr, username=username, password=password)
+            host = cls.create(name=name, path=path, status=True, ip_addr=ip_addr, port=port, username=username, password=password)
         except Exception as e:
             print(e)
             return None
         return host
-
-    @classmethod
-    def list(cls):
-        hosts = cls.select().where(cls.status == True)
-        return hosts
     
     @classmethod
     def count(cls):
-        return cls.select().where(cls.status == True).count()
+        return cls.list().count()
         
     @classmethod
     def get_host_by_md5(cls, md5):

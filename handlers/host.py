@@ -5,18 +5,18 @@ from flask import request
 from flask_restful import Resource, marshal_with
 
 from models.host import Host
+from utils.response import BAD_REQUEST
 from base import resource_fields, APIResponse
 
 class HostEndpoint(Resource):
 
     decorators = [marshal_with(resource_fields)]
 
-    def get(self):
+    def get(self, uid):
         """
         获取主机信息
         """
-        host_id = request.args.get("host_id")
-        host = Host.get_or_none(Host.id == host_id)
+        host = Host.get_by_uid(uid)
         host = host.to_json() if host else None
         return APIResponse(code=0, data=host)
 
@@ -24,12 +24,16 @@ class HostEndpoint(Resource):
         """
         添加主机
         """
-        name = request.get_json().get("name")
-        path = request.get_json().get("path")
-        ip_addr = request.get_json().get("ip_addr")
-        username = request.get_json().get("username")
-        password = request.get_json().get("password")
-        host = Host.create_host(name, path, ip_addr, username, password)
+        params = request.get_json()
+        if not params:
+            return APIResponse(code=BAD_REQUEST)
+        name = params.get("name")
+        path = params.get("path")
+        port = params.get("port")
+        ip_addr = params.get("ip_addr")
+        username = params.get("username")
+        password = params.get("password")
+        host = Host.create_host(name, path, ip_addr, port, username, password)
         host = host.to_json() if host else None
         return APIResponse(code=0, data=host)
 
